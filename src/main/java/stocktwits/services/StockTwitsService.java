@@ -1,6 +1,7 @@
 package stocktwits.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import stocktwits.mappers.StockTwitsMapper;
@@ -12,6 +13,9 @@ import java.util.ArrayList;
 
 @Service
 public class StockTwitsService {
+
+    @Value("this.is.ryan")
+    String ryanVal;
 
     @Autowired
     RestTemplate restTemplate;
@@ -28,6 +32,13 @@ public class StockTwitsService {
 
     public TickerSentiment getSentimentByPK(String ticker, String datetime){
         return stockTwitsMapper.getTickerSentimentByPK(ticker, datetime);
+    }
+
+    public TickerSentiment getSentimentByTicker(String ticker) {
+        String fQuery = "https://api.stocktwits.com/api/2/streams/symbol/"+ticker+".json";
+        TickerStreamRoot tickerStreamRoot1 = restTemplate.getForObject(fQuery, TickerStreamRoot.class);
+        TickerSentiment tickerSentiment = new TickerSentiment(tickerStreamRoot1);
+        return tickerSentiment;
     }
 
     public ArrayList<TickerSentiment> getTickerSentimentHistory(String ticker){
@@ -67,7 +78,7 @@ public class StockTwitsService {
         stockTwitsMapper.deleteSentiment(ticker, datetime);
         return tickerSentiment;
     }
-    
+
 
 
 }

@@ -12,12 +12,14 @@ import java.util.ArrayList;
 @Mapper
 public interface StockTwitsMapper {
 
+    String GET_TICKER_SENTIMENT = "SELECT * FROM `Stocktwits`.sentiment where ticker = #{ticker}";
+
     String GET_TICKER_SENTIMENT_PK = "SELECT * FROM `Stocktwits`.sentiment where ticker = #{arg0} AND " +
                                         "datetime = #{arg1}";
     String GET_TICKER_SENTIMENT_HISTORY = "SELECT * FROM `Stocktwits`.sentiment where ticker = #{ticker}";
     String INSERT_SENTIMENT = "INSERT INTO `Stocktwits`.sentiment (ticker, datetime, name, bullishcount, bearishcount, " +
                                                                    "sentimentRating) " +
-            "VALUES (#{ticker}, #{datetime}, #{name}, #{bullishcount}, #{bearishcount},#{sentimentRating})";
+            "VALUES (#{ticker}, #{datetime}, #{name}, #{bullishcount}, #{bearishcount}, #{sentimentRating})";
     String UPDATE_SENTIMENT = "UPDATE `Stocktwits`.sentiment SET bullishcount = #{bullishcount}, " +
             "bearishcount = #{bearishcount}, sentimentRating = #{sentimentRating} " +
             "WHERE ticker = #{ticker} AND datetime = #{datetime}";
@@ -26,6 +28,9 @@ public interface StockTwitsMapper {
 
     @Select(GET_TICKER_SENTIMENT_PK)
     public TickerSentiment getTickerSentimentByPK(String ticker, String datetime);
+
+    @Select(GET_TICKER_SENTIMENT)
+    TickerSentiment getTickerSentimentByTicker(String ticker);
 
     @Select(GET_TICKER_SENTIMENT_HISTORY)
     public ArrayList<TickerSentiment> getTickerSentimentHistory(String ticker);
@@ -38,5 +43,6 @@ public interface StockTwitsMapper {
 
     @Update(DELETE_SENTIMENT)
     public int deleteSentiment(String ticker, String datetime);
+
 
 }

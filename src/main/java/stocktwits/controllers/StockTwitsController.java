@@ -21,26 +21,39 @@ public class StockTwitsController {
         return stockTwitsService.getStreamTicker(ticker);
     }
 
+    @RequestMapping("/sentiment/{ticker:.+}")
+    public TickerSentiment getTickerSentiment(@PathVariable(value="ticker")String ticker) {
+        return stockTwitsService.getSentimentByTicker(ticker);
+    }
+
     @RequestMapping("/sentiment/{ticker}/{datetime}")
     public TickerSentiment getTickerSentiment(@PathVariable(value="ticker")String ticker,
                                               @PathVariable(value="datetime")String datetime) {
         return stockTwitsService.getSentimentByPK(ticker, datetime);
     }
 
-    @RequestMapping("/compare")
+
+    @RequestMapping("/sentiment/compare")
     public CompareSentiment compareSentiment(@RequestParam(value="ticker1")String ticker1,
                                              @RequestParam(value="ticker2")String ticker2){
         return stockTwitsService.compareSentiment(ticker1, ticker2);
     }
 
     // Create Ticker Sentiment
-    @RequestMapping(method = RequestMethod.POST, value = "/")
+    @RequestMapping(method = RequestMethod.POST, value = "/sentiment")
     public TickerSentiment insertTickerSentiment(@RequestBody TickerSentiment tickerSentiment) {
         return stockTwitsService.insertTickerSentiment(tickerSentiment);
     }
 
-    // Read Ticker Sentiment
-    @RequestMapping(method= RequestMethod.GET, value = "/{ticker:.+}")
+    // Read Ticker Sentiment History
+    @RequestMapping(method= RequestMethod.GET, value = "/getsentiment/{ticker:.+}/{datetime}")
+    public TickerSentiment getTickerSentimentDB(@PathVariable(value="ticker")String ticker,
+                                                @PathVariable(value="ticker")String datetime) {
+        return stockTwitsService.getSentimentByPK(ticker, datetime);
+    }
+
+    // Read Ticker Sentiment History
+    @RequestMapping(method= RequestMethod.GET, value = "/getsentiment/{ticker:.+}")
     public ArrayList<TickerSentiment> getTickerSentimentHistory(@PathVariable(value="ticker")String ticker) {
         return stockTwitsService.getTickerSentimentHistory(ticker);
     }

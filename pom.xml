@@ -45,12 +45,20 @@
             <artifactId>json-path</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--Dependency for running on Tomcat Server-->
+        <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+            <version>3.1.0.RELEASE</version>
         </dependency>
+
+        <!--Dependency for running on Tomcat Server-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+
     </dependencies>
 
     <properties>

@@ -12,15 +12,15 @@ import java.util.ArrayList;
 @Mapper
 public interface StockTwitsMapper {
 
-    String GET_TICKER_SENTIMENT = "SELECT * FROM `Stocktwits`.sentiment where ticker = #{ticker}";
+    String GET_TICKER_SENTIMENT = "SELECT * FROM `StockTwits`.sentiment where ticker = #{ticker}";
 
-    String GET_TICKER_SENTIMENT_PK = "SELECT * FROM `Stocktwits`.sentiment where ticker = #{arg0} AND " +
+    String GET_TICKER_SENTIMENT_PK = "SELECT * FROM `StockTwits`.sentiment where ticker = #{arg0} AND " +
                                         "datetime = #{arg1}";
-    String GET_TICKER_SENTIMENT_HISTORY = "SELECT * FROM `Stocktwits`.sentiment where ticker = #{ticker}";
-    String INSERT_SENTIMENT = "INSERT INTO `Stocktwits`.sentiment (ticker, datetime, name, bullishcount, bearishcount, " +
+    String GET_TICKER_SENTIMENT_HISTORY = "SELECT * FROM `StockTwits`.sentiment where ticker = #{ticker}";
+    String INSERT_SENTIMENT = "INSERT INTO `StockTwits`.sentiment (ticker, datetime, name, bullishcount, bearishcount, " +
                                                                    "sentimentRating) " +
             "VALUES (#{ticker}, #{datetime}, #{name}, #{bullishcount}, #{bearishcount}, #{sentimentRating})";
-    String UPDATE_SENTIMENT = "UPDATE `Stocktwits`.sentiment SET bullishcount = #{bullishcount}, " +
+    String UPDATE_SENTIMENT = "UPDATE `StockTwits`.sentiment SET bullishcount = #{bullishcount}, " +
             "bearishcount = #{bearishcount}, sentimentRating = #{sentimentRating} " +
             "WHERE ticker = #{ticker} AND datetime = #{datetime}";
     String DELETE_SENTIMENT = "DELETE FROM StockTwits.sentiment " +

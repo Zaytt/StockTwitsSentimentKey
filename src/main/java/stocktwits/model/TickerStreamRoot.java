@@ -1,11 +1,14 @@
 package stocktwits.model;
 
+import stocktwits.model.exception.Error;
+
 public class TickerStreamRoot {
 
     Response response;
     Symbol symbol;
     Cursor cursor;
     Message[] messages;
+    Error[] errors;
 
     public Response getResponse() {
         return response;
@@ -37,5 +40,13 @@ public class TickerStreamRoot {
 
     public void setMessages(Message[] messages) {
         this.messages = messages;
+    }
+
+    public Error[] getErrors() {
+        return errors;
+    }
+
+    public void setErrors(Error[] errors) {
+        this.errors = errors;
     }
 }

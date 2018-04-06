@@ -8,7 +8,7 @@ public class APIUser {
     private String last_name;
     private String name;
     private String password;
-    private String api_key;
+    private String apikey;
 
     public int getUser_id() {
         return user_id;
@@ -58,11 +58,11 @@ public class APIUser {
         this.password = password;
     }
 
-    public String getApi_key() {
-        return api_key;
+    public String getApikey() {
+        return apikey;
     }
 
-    public void setApi_key(String api_key) {
-        this.api_key = api_key;
+    public void setApikey(String apikey) {
+        this.apikey = apikey;
     }
 }

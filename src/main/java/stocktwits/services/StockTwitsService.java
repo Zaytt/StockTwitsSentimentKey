@@ -2,8 +2,14 @@ package stocktwits.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import stocktwits.exception.APIUnavailableException;
+import stocktwits.exception.SymbolNotFoundException;
 import stocktwits.mappers.StockTwitsMapper;
+import stocktwits.model.StockTwitsResponse;
 import stocktwits.model.TickerStreamRoot;
 import stocktwits.model.analyze.CompareSentiment;
 import stocktwits.model.analyze.TickerSentiment;
@@ -23,53 +29,69 @@ public class StockTwitsService {
     StockTwitsMapper stockTwitsMapper;
 
     @Autowired
-    KeyService loginService;
+    UserService userService;
 
-    public TickerStreamRoot getStreamTicker(String ticker, String key){
 
-        if(!loginService.validateKey(key)) return null;
+
+    public TickerStreamRoot getStreamTicker(String ticker)
+            throws SymbolNotFoundException, RestClientException, APIUnavailableException {
+
 
         String fQuery = "https://api.stocktwits.com/api/2/streams/symbol/"+ticker+".json";
-        TickerStreamRoot tickerStreamRoot = restTemplate.getForObject(fQuery, TickerStreamRoot.class);
+        TickerStreamRoot tickerStreamRoot = null;
+        try {
+            tickerStreamRoot = restTemplate.getForObject(fQuery, TickerStreamRoot.class);
+        } catch (HttpClientErrorException e) {
+            if(e.getRawStatusCode() == 404)
+                throw new SymbolNotFoundException();
+        } catch (RestClientException e) {
+            throw e;
+        }
+
+        if(tickerStreamRoot == null)
+            throw new APIUnavailableException();
 
         return tickerStreamRoot;
 
 
     }
 
-    public TickerSentiment getSentimentByPK(String ticker, String datetime, String key){
-        if(!loginService.validateKey(key)) return null;
+    public TickerSentiment getSentimentByPK(String ticker, String datetime){
+
         return stockTwitsMapper.getTickerSentimentByPK(ticker, datetime);
     }
 
-    /**
-     * Designed without the need of an API key for internal use only.
-     * @param ticker
-     * @return
-     */
-    public TickerSentiment getSentimentByTicker(String ticker) {
+    public TickerSentiment getSentimentByTicker(String ticker)
+            throws SymbolNotFoundException, RestClientException, APIUnavailableException {
         String fQuery = "https://api.stocktwits.com/api/2/streams/symbol/"+ticker+".json";
-        TickerStreamRoot tickerStreamRoot1 = restTemplate.getForObject(fQuery, TickerStreamRoot.class);
-        TickerSentiment tickerSentiment = new TickerSentiment(tickerStreamRoot1);
+        TickerStreamRoot tickerStreamRoot = null;
+        try {
+         tickerStreamRoot = restTemplate.getForObject(fQuery, TickerStreamRoot.class);
+        } catch (HttpClientErrorException e) {
+            if(e.getRawStatusCode() == 404)
+                throw new SymbolNotFoundException();
+        } catch (RestClientException e) {
+            throw e;
+        }
+
+        if(tickerStreamRoot == null)
+            throw new APIUnavailableException();
+
+        TickerSentiment tickerSentiment = new TickerSentiment(tickerStreamRoot);
         return tickerSentiment;
     }
 
-    public TickerSentiment getSentimentByTicker(String ticker, String key) {
-        if(!loginService.validateKey(key)) return null;
-        String fQuery = "https://api.stocktwits.com/api/2/streams/symbol/"+ticker+".json";
-        TickerStreamRoot tickerStreamRoot1 = restTemplate.getForObject(fQuery, TickerStreamRoot.class);
-        TickerSentiment tickerSentiment = new TickerSentiment(tickerStreamRoot1);
-        return tickerSentiment;
+    public ArrayList<TickerSentiment> getTickerSentimentHistory(String ticker){
+        ArrayList<TickerSentiment> tickerSentimentArrayList = null;
+        try {
+            tickerSentimentArrayList = stockTwitsMapper.getTickerSentimentHistory(ticker);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tickerSentimentArrayList;
     }
 
-
-    public ArrayList<TickerSentiment> getTickerSentimentHistory(String ticker, String key){
-        if(!loginService.validateKey(key)) return null;
-        return stockTwitsMapper.getTickerSentimentHistory(ticker);
-    }
-
-    public CompareSentiment compareSentiment(String ticker1, String ticker2, String key){
-        if(!loginService.validateKey(key)) return null;
+    public CompareSentiment compareSentiment(String ticker1, String ticker2) {
         String fQuery = "https://api.stocktwits.com/api/2/streams/symbol/"+ticker1+".json";
         String fQuery2 = "https://api.stocktwits.com/api/2/streams/symbol/"+ticker2+".json";
 
@@ -84,32 +106,20 @@ public class StockTwitsService {
         return compareSentiment;
     }
 
-    /**
-     * Designed without the need of an API key for internal use only.
-     * @param tickerSentiment
-     * @return
-     */
-    public TickerSentiment insertTickerSentiment(TickerSentiment tickerSentiment) {
-        stockTwitsMapper.insertSentiment(tickerSentiment);
-        return stockTwitsMapper.getTickerSentimentByPK(tickerSentiment.getTicker(), tickerSentiment.getDatetime());
-    }
     //add new ticker sentiment
-    public TickerSentiment insertTickerSentiment(TickerSentiment tickerSentiment, String key) {
-        if(!loginService.validateKey(key)) return null;
+    public TickerSentiment insertTickerSentiment(TickerSentiment tickerSentiment){
         stockTwitsMapper.insertSentiment(tickerSentiment);
         return stockTwitsMapper.getTickerSentimentByPK(tickerSentiment.getTicker(), tickerSentiment.getDatetime());
     }
 
     //update a ticker sentiment
-    public TickerSentiment updateByPK(TickerSentiment tickerSentiment, String key) {
-        if(!loginService.validateKey(key)) return null;
+    public TickerSentiment updateByPK(TickerSentiment tickerSentiment){
         stockTwitsMapper.updateSentiment(tickerSentiment);
         return stockTwitsMapper.getTickerSentimentByPK(tickerSentiment.getTicker(), tickerSentiment.getDatetime());
     }
 
     //update a ticker sentiment
-    public TickerSentiment deleteByPK(String ticker, String datetime, String key) {
-        if(!loginService.validateKey(key)) return null;
+    public TickerSentiment deleteByPK(String ticker, String datetime) {
         TickerSentiment tickerSentiment = stockTwitsMapper.getTickerSentimentByPK(ticker, datetime);
         stockTwitsMapper.deleteSentiment(ticker, datetime);
         return tickerSentiment;
